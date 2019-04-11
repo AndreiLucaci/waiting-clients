@@ -66,14 +66,12 @@ namespace WaitingClients.Processors
         {
             for (var i = 0; i < nr; i++)
             {
-                var client = new Client
-                {
-                    ArrivalTime = DateTime.Now,
-                    ProcessingTime = new Random().Next(2, 5)
-                };
+                var client = new Client();
 
                 Clients.Add(client);
             }
+
+            _eventAggregator.GetEvent<GenerateClientsCompletedEvent>().Publish();
         }
 
         public void Stop()

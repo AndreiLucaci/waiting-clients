@@ -35,6 +35,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Numerics" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -44,6 +45,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Client.cs" />
+    <Compile Include="Events\GenerateClientsCompletedEvent.cs" />
     <Compile Include="Events\GenerateClientsEvent.cs" />
     <Compile Include="Events\LogEvent.cs" />
     <Compile Include="Events\StopEvent.cs" />

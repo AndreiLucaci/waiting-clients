@@ -2,7 +2,6 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
 using System.Threading;
 using System.Windows;
 using CommonServiceLocator;
@@ -47,16 +46,28 @@ namespace WaitingClients.Gui.ViewModels
 
             StartCommand = new DelegateCommand(OnStart);
             StopCommand = new DelegateCommand(OnStop);
-            GenerateCommand = new DelegateCommand(() => _eventAggregator.GetEvent<GenerateClientsEvent>().Publish(int.Parse(GenerateClientsNr)));
+            GenerateCommand = new DelegateCommand(() =>
+            {
+                if (GenerateClientsNr != null)
+                {
+                    _eventAggregator.GetEvent<GenerateClientsEvent>().Publish(int.Parse(GenerateClientsNr));
+                    if (_store != null)
+                    {
+                        WaitingClients.Clear();
+                        WaitingClients.AddRange(_store.Clients);
+                    }
+                }
+            });
 
             _eventAggregator.GetEvent<LogEvent>().Subscribe(OnLog);
-            _eventAggregator.GetEvent<GenerateClientsEvent>().Subscribe(OnGenerate);
+            _eventAggregator.GetEvent<GenerateClientsCompletedEvent>().Subscribe(OnGenerate);
         }
 
         ~MainWindowViewModel()
         {
             _eventAggregator.GetEvent<LogEvent>().Unsubscribe(OnLog);
-            _eventAggregator.GetEvent<GenerateClientsEvent>().Unsubscribe(OnGenerate);
+            _eventAggregator.GetEvent<GenerateClientsCompletedEvent>().Unsubscribe(OnGenerate);
+            OnStop();
         }
 
         private void OnStart()
@@ -84,7 +95,7 @@ namespace WaitingClients.Gui.ViewModels
             }).Start();
         }
 
-        private void OnGenerate(int payload)
+        private void OnGenerate()
         {
             if (_store != null)
             {
@@ -97,7 +108,7 @@ namespace WaitingClients.Gui.ViewModels
         {
             var queue = _mapper[log.QueueGuid];
 
-            Application.Current.Dispatcher.Invoke(() =>
+            Application.Current?.Dispatcher?.Invoke(() =>
             {
                 queue.Add(log.Client);
 
