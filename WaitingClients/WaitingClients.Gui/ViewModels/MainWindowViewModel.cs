@@ -67,7 +67,6 @@ namespace WaitingClients.Gui.ViewModels
         {
             _eventAggregator.GetEvent<LogEvent>().Unsubscribe(OnLog);
             _eventAggregator.GetEvent<GenerateClientsCompletedEvent>().Unsubscribe(OnGenerate);
-            OnStop();
         }
 
         private void OnStart()
@@ -126,10 +125,11 @@ namespace WaitingClients.Gui.ViewModels
         private void Reset()
         {
             WaitingClients.Clear();
-            Q1.Clear();
-            Q2.Clear();
-            Q3.Clear();
-            Q4.Clear();
+
+            foreach (var keyValuePair in _mapper)
+            {
+                keyValuePair.Value.Clear();
+            }
 
             Log = string.Empty;
 
